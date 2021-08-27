@@ -107,6 +107,8 @@ new Server({
         const numerifyId = (todo) => {
           todo.id = Number(todo.id)
         }
+        console.log('serialize(object, request) this, arguments', this, arguments);
+        
         let json = IdSerializer.prototype.serialize.apply(this, arguments)
 
         if (json.todo) {
