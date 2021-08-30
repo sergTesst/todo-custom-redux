@@ -1,6 +1,13 @@
 import { actionTypes } from '../appActionTypes'
 
-import todosReducer, { initialState } from './todoSlice'
+import todosReducer from './todoSlice'
+
+const initialState = [
+  { id: 0, text: 'Learn React', completed: true },
+  { id: 1, text: 'Learn Redux', completed: false, color: 'purple' },
+  { id: 2, text: 'Build something fun!', completed: false, color: 'blue' },
+];
+
 
 describe('todo reducer', () => {
   const testInitialState = [
@@ -23,6 +30,7 @@ describe('todo reducer', () => {
         completed: false,
       },
     ];
+		
     expect(newState).toEqual(expectedState);
   })
 	
@@ -80,7 +88,8 @@ describe('todo reducer', () => {
 				...third
 			}
     ];
-
+		expect(expectedState[todoIdToToggle].completed).toBe(true);
+		
 		expect(newState).toEqual(expectedState);
 
 	})

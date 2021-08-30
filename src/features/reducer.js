@@ -1,6 +1,6 @@
-import todosReducer from "../features/todos/todoSlice";
-import filtersReducer from '../features/filters/filtersSlice';
-
+import todosReducer from "./todos/todoSlice";
+import filtersReducer from './filters/filtersSlice';
+import { combineReducers } from "redux";
 
 //reducer rules
 //	to calculate the new state based on the state and action arguments
@@ -25,14 +25,18 @@ import filtersReducer from '../features/filters/filtersSlice';
 
 
 // state = {
-//  todos:{...},
-//  filters:{...}
+//  todos:todosReducer,
+//  filters:filtersReducer
 // }
  
-export default function rootReducer(state = {}, action) {
-  //always return a new object for the root state
-  return {
-    todos:todosReducer(state.todos, action),
-    filters: filtersReducer(state.filters, action)
-  }
-}
+//reducer composition
+
+const rootReducer = combineReducers( {
+
+  // todos field handled by todosReducer
+  todos:todosReducer,
+  filters: filtersReducer
+
+})
+
+export default rootReducer;
