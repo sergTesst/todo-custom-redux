@@ -4,14 +4,16 @@ export const actionTypes = {
 	todosToggled:'todos/todoToggled',
 	todosColorSelected:'todos/colorSelected',
 	todoDeleted:'todos/todoDeleted',
+	
 	allTodosCompleted:'todos/allCompleted',
 	todosCompletedCleared:'todos/completedCleared',
+
 	statusFilterChanged:'filters/statusFilterChanged',
 	colorFilterChanged:'filters/colorFilterChanged',
 }
 
-
-const actions = [
+/*
+	const actions = [
 	{type:actionTypes.todosAdded, payload:todoText},
 	{type:actionTypes.todosToggled, payload:todoId},
 	{type:actionTypes.todosColorSelected, payload:{todoId, color}},
@@ -21,3 +23,5 @@ const actions = [
 	{type:actionTypes.statusFilterChanged, payload:filterValue},
 	{type:actionTypes.colorFilterChanged, payload:{color, changeType}}	
 ]
+*/
+

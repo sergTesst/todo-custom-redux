@@ -1,4 +1,4 @@
-import { actionTypes } from '../features/todos/todoActionTypes'
+import { actionTypes } from '../features/appActionTypes'
 
 const initialState = {
   todos: [
