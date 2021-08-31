@@ -3,7 +3,8 @@ import React from 'react'
 import { availableColors, capitalize } from '../filters/colors'
 import { StatusFilters } from '../filters/filtersSlice'
 
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { actionTypes } from '../appActionTypes'
 
 const RemainingTodos = ({ count }) => {
   const suffix = count === 1 ? '' : 's'
@@ -75,19 +76,44 @@ const AsideBar = () => {
     const uncompleteTodos = state.todos.filter((todo) => !todo.completed)
     return Array.from(uncompleteTodos).length
   })
+  const dispatch = useDispatch()
 
   const onColorChange = (color, changeType) => {
-    console.log('Color change: ', { color, changeType })
+    // console.log('Color change: ', { color, changeType })
+    dispatch({
+      type: actionTypes.colorFilterChanged,
+      payload: { color, changeType },
+    })
   }
   const onStatusChange = (status) => {
-    console.log('Status change: ', status)
+    // console.log('Status change: ', status);
+    dispatch({
+      type:actionTypes.statusFilterChanged,
+      payload:status
+    })
+
   }
+  const markAllCompletedHandler = () => {
+    dispatch({
+      type:actionTypes.allTodosCompleted,
+    })
+  }
+  const clearCompletedHandler = () => {
+    dispatch({
+      type:actionTypes.todosCompletedCleared,
+    })
+  }
+
   return (
     <aside className="aside-bar">
       <div className="actions">
         <h5>Actions</h5>
-        <button className="button">Mark All Completed</button>
-        <button className="button">Clear Completed</button>
+        <button onClick={markAllCompletedHandler} className="button">
+          Mark All Completed
+        </button>
+        <button onClick={clearCompletedHandler} className="button">
+          Clear Completed
+        </button>
       </div>
 
       <RemainingTodos count={todosRemaining}></RemainingTodos>

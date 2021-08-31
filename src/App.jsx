@@ -1,7 +1,7 @@
 import React from 'react'
-import { Header } from './features/header/Header';
-import AsideBar from './features/asidebar/AsideBar';
-import TodoList from './features/todos/TodoList';
+import { Header } from './features/header/Header.jsx';
+import AsideBar from './features/asidebar/AsideBar.jsx';
+import TodoList from './features/todos/TodoList.jsx';
 
 
 
