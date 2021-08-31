@@ -5,6 +5,8 @@ import App from './App'
 
 import './api/server'
 import store from './app/store'
+import 'bootstrap/dist/css/bootstrap.css';
+import { Provider } from 'react-redux'
 
 //initial state
 console.log('Initial state: ', store.getState())
@@ -38,8 +40,11 @@ unsubscribe()
 store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' })
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Provider store={store}>
+      <React.StrictMode>
+        <App />
+    </React.StrictMode>
+  </Provider>
+,
   document.getElementById('root')
 )

@@ -391,16 +391,17 @@ ul.todo-list {
 }
 
 .todo-list li select.colorPicker {
-  width: 90px !important;
+  width: 150px !important;
   padding: 0.1rem 0 0.1rem 0.4rem;
   margin: 0 10px;
-  height: 30px;
-  line-height: 24px;
-  font-weight: 700;
+  /* height: 30px; */
+  /* line-height: 24px;
+  font-weight: 700; */
 }
 
 .todo-list li select.colorPicker option {
-  font-weight: 700;
+  /* font-weight: 700; */
+  color:#737373;
 }
 
 .todo-list li select.colorPicker option[value='green'] {
@@ -447,27 +448,30 @@ ul.todo-list {
   width: 0.6875em;
 }
 
-.footer {
+.aside-bar {
   padding: 10px 15px;
   text-align: center;
   font-size: 15px;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   border-top: 1px solid #e6e6e6;
 }
 
-.footer h5 {
+.aside-bar h5 {
   font-size: 1rem;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
-
-.footer .actions {
+.aside-bar ul{
+  display: flex;
+}
+.aside-bar .actions {
   display: flex;
   flex-direction: column;
 }
 
-.footer .actions button {
+.aside-bar .actions button {
   padding: 5px 10px;
   margin: 5px 6px 10px;
   border-radius: 4px;
@@ -555,7 +559,7 @@ ul.todo-list {
 }
 
 @media (max-width: 840px) {
-  .footer {
+  .aside-bar {
     flex-direction: column;
     align-items: center;
   }
@@ -586,4 +590,8 @@ form.colorSelection label {
 
 form.colorSelection input[type='checkbox'] {
   margin-right: 5px;
+}
+
+form.colorSelection{
+  display: flex;
 }

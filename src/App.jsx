@@ -1,20 +1,56 @@
 import React from 'react'
+import { Header } from './features/header/Header';
+import AsideBar from './features/asidebar/AsideBar';
+import TodoList from './features/todos/TodoList';
+
+
 
 function App() {
   return (
     <div className="App">
-      <nav>
-        <section>
-          <h1>Redux Fundamentals Example</h1>
+      <main>
+        <div className="container">
 
-          <div className="navContent">
-            <div className="navLinks"></div>
+          <div className="row">
+
+            <div className="row">
+              <section className="medium-container">
+                <h2>Todos</h2>
+                <div className="todoapp">
+                  <Header />
+
+                </div>
+              </section>
+            </div>
+
+            <div className="row mt-3">
+              <div className="col-md-4">
+                <div className='card shadow'>
+
+                  <AsideBar></AsideBar>
+
+                </div>
+
+              </div>
+
+              <div className="col-md-8">
+                <section className="todoapp">
+                  {/* todoapp */}
+                  <div className="">
+                    <h2>todo list</h2>
+                    
+                    <TodoList />
+                    
+                  </div>
+                </section>
+              </div>
+            </div>
+            
           </div>
-        </section>
-      </nav>
-      <section>
-        <h2>Welcome to the Redux Fundamentals example app!</h2>
-      </section>
+
+        </div>
+
+      </main>
     </div>
   )
 }
