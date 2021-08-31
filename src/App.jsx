@@ -25,7 +25,7 @@ function App() {
 
             <div className="row mt-3">
               <div className="col-md-4">
-                <div className='card shadow'>
+                <div className='card shadow sticky-sm-top'>
 
                   <AsideBar></AsideBar>
 

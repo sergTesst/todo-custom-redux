@@ -4,7 +4,18 @@
 
 html {
   height: 100%;
+
+  /* always show a scrollbar */
+  /* overflow-y: scroll; */
+
 }
+@media screen and (min-width: 960px){
+  html{
+    margin-left:calc(100vw - 100%)!important;
+    margin-left:0;
+  }
+}
+
 body {
   height: 100vh;
   min-height: 100vh;

@@ -2,21 +2,20 @@ import React from 'react'
 import TodoListItem from './TodoListItem'
 import { useSelector } from 'react-redux'
 
-const selectTodos = (state) => state.todos
+//returning new array references in selectors causes components to re-render every time
+
+const selectTodoIds = state => state.todos.map(todo=>todo.id);
 
 const TodoList = () => {
-  const todos = useSelector(selectTodos)
-  const onColorChangeHandler = (e) => {}
-  const onCompleteChangeHandler = (e) => {}
-  const onDeleteHandler = (e) => {}
-  const renderedListItems = todos.map((todo) => {
+
+//useSelector can take a comparison func as a second arg
+  const todoIds = useSelector(selectTodoIds);
+
+  const renderedListItems = todoIds.map((todoId) => {
     return (
       <TodoListItem
-        key={todo.id}
-        todo={todo}
-        onColorChange={onColorChangeHandler}
-        onCompleteChange={onCompleteChangeHandler}
-        onDelete={onDeleteHandler}
+        key={todoId}
+        id={todoId}
       />
     )
   })
