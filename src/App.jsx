@@ -23,8 +23,8 @@ function App() {
               </section>
             </div>
 
-            <div className="row mt-3">
-              <div className="col-md-4">
+            <div className="row mt-3 ">
+              <div className="col-md-4 mb-3">
                 <div className='card shadow sticky-sm-top'>
 
                   <AsideBar></AsideBar>

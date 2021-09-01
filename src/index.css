@@ -233,7 +233,7 @@ main h2 {
 
 .todoapp {
   background: #fff;
-  min-width: 800px;
+
   position: relative;
   display: flex;
   text-align: left;
@@ -402,7 +402,7 @@ ul.todo-list {
 }
 
 .todo-list li select.colorPicker {
-  width: 150px !important;
+  /* width: 150px !important; */
   padding: 0.1rem 0 0.1rem 0.4rem;
   margin: 0 10px;
   /* height: 30px; */
@@ -413,6 +413,12 @@ ul.todo-list {
 .todo-list li select.colorPicker option {
   /* font-weight: 700; */
   color:#737373;
+}
+
+@media screen and (min-width:960px) {
+  .todo-list li select.colorPicker option {
+    width:100px !important;
+  }
 }
 
 .todo-list li select.colorPicker option[value='green'] {
@@ -603,6 +609,15 @@ form.colorSelection input[type='checkbox'] {
   margin-right: 5px;
 }
 
-form.colorSelection{
-  display: flex;
+@media screen and (min-width:1400px) {
+  form.colorSelection{
+    display: flex;
+  }
 }
+@media screen and (max-width:1400px) {
+  form.colorSelection{
+    display: flex;
+    flex-direction: column;
+  }
+}
+
