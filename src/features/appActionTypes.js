@@ -5,11 +5,14 @@ export const actionTypes = {
 	todosColorSelected:'todos/colorSelected',
 	todoDeleted:'todos/todoDeleted',
 	
+	todosLoaded:'todos/todosLoaded',
+
 	allTodosCompleted:'todos/allCompleted',
 	todosCompletedCleared:'todos/completedCleared',
 
 	statusFilterChanged:'filters/statusFilterChanged',
 	colorFilterChanged:'filters/colorFilterChanged',
+
 }
 
 /*

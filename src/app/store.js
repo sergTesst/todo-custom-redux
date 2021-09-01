@@ -1,5 +1,5 @@
-import { createStore, compose, applyMiddleware } from 'redux';
-import {composeWithDevTools} from 'redux-devtools-extension';
+import { createStore, compose, applyMiddleware } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
 
 import rootReducer from '../features/reducer'
 
@@ -15,8 +15,12 @@ import {
   loggerMiddleware,
   alwaysStringResultMiddleware,
   delayedMessageMiddleware,
-  delayedActionMiddleware,
 } from '../exampleAddons/middleware'
+
+import {
+  delayedActionMiddleware,
+  asyncFunctionMiddleware,
+} from '../exampleAddons/asyncMiddleware'
 
 // import {createMiniStore} from './miniReduxStoreExample';
 
@@ -54,13 +58,15 @@ import {
 //Pass enhancer as the second arg, since there's no preloadedState
 //const store = createStore(rootReducer, middlewareEnhancer)
 
-
 const composedEnhancer = composeWithDevTools(
-
-	// add whatever middleware you actually want to use here
-	applyMiddleware(loggerMiddleware)
+  
+  // add whatever middleware you actually want to use here
+  applyMiddleware(
+    loggerMiddleware,
+    delayedActionMiddleware,
+    asyncFunctionMiddleware
+  )
 )
 const store = createStore(rootReducer, composedEnhancer)
-
 
 export default store

@@ -99,6 +99,13 @@ export default function todosReducer(state = initialState, action) {
       //return all todo[] with completed false
       return state.filter((todo) => !todo.completed)
     }
+    case actionTypes.todosLoaded:{
+      const {todos} = action.payload;
+      return [
+        ...state,
+        ...todos
+      ]
+    }
 
     default:
       return state

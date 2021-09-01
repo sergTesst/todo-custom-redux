@@ -79,19 +79,8 @@ export const delayedMessageMiddleware = storeAPI => next => action =>{
   return next(action);
 
 }
-const sleep = (ms)=>{
-	return new Promise(resolve=>setTimeout(resolve, ms))
-}
-// not working as expected and returns pending promise
-export const delayedActionMiddleware = storeAPI => next => async action =>{
-
-  if(action.type===actionTypes.todosAdded){
-    await sleep(1000);
-    return next(action);
-  }
 
 
-}
 
 
 
