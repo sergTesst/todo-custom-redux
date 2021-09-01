@@ -1,6 +1,8 @@
 
 export const actionTypes = {
 	todosAdded:'todos/todoAdded',
+	todosFetchAdded:'todos/todoFetchAdded',
+
 	todosToggled:'todos/todoToggled',
 	todosColorSelected:'todos/colorSelected',
 	todoDeleted:'todos/todoDeleted',

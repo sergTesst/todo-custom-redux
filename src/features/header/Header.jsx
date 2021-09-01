@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { useDispatch } from 'react-redux';
 import { actionTypes } from '../appActionTypes';
 
-
+import {saveNewTodo} from '../todos/customFetchers';
 
 export const Header = ()=>{
 	const [text, setText] = useState('');
@@ -11,7 +11,10 @@ export const Header = ()=>{
 	const handleKeyDown = (e)=>{
 		const trimmedText = e.target.value.trim();
 		if(e.key==='Enter'&& trimmedText){
-			dispatch({type:actionTypes.todosAdded, payload:trimmedText});
+			
+			//create the thunk func with text
+			dispatch(saveNewTodo(trimmedText));
+
 			setText('');
 		}
 	}

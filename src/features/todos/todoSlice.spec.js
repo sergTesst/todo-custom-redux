@@ -21,11 +21,11 @@ describe('todo reducer', () => {
       type: actionTypes.todosAdded,
       payload: newTodoText,
     });
-
+		const newTodo = newState[newState.length-1];
     const expectedState = [
       ...testInitialState,
       {
-        id: 3,
+        id: newTodo.id,
         text: newTodoText,
         completed: false,
       },

@@ -6,7 +6,8 @@ function nextTodoId(todos) {
     -1
   );
 
-  return maxId + 1
+  return maxId + 1 + Number((new Date()).getTime());
+
 }
 
 /**
@@ -42,8 +43,21 @@ export default function todosReducer(state = initialState, action) {
           text: nextTodoText,
           completed: false,
         },
+
       ]
     }
+    case actionTypes.todosFetchAdded: {
+
+      const newTodo = action.payload;
+
+      return [
+        ...state,
+        {
+          ...newTodo
+        }
+      ]
+    }
+    
     // action.payload: number //id
     case actionTypes.todosToggled: {
       const targetTodoId = action.payload
