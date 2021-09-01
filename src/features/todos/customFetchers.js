@@ -13,25 +13,43 @@ import { actionTypes } from '../appActionTypes'
 // 	})
 // }
 
-export async function fetchTodosData(dispatch, getState) {
-  const response = await client.get('/fakeApi/todos')
-  const stateBefore = getState()
-  console.log(
-    'todos before dispatch stateBefore.todos.length',
-    stateBefore.todos.length
-  )
+export const todosLoaded = (todos) => {
+  return { type: actionTypes.todosLoaded, payload: todos }
+}
 
-  dispatch({ type: actionTypes.todosLoaded, payload: response })
+// export function fetchTodos() {
+//   return async function fetchTodosThunk(dispatch, getState) {
+//     const stateBefore = getState()
+//     console.log(
+//       'todos before dispatch stateBefore.todos.length',
+//       stateBefore.todos.length
+//     )
 
-  const allTodos = getState().todos
-  console.log('allTodos.length after dispatch', Array.from(allTodos).length)
+//     const response = await client.get('/fakeApi/todos')
+
+//     dispatch(todosLoaded(response))
+
+//     const allTodos = getState().todos
+//     console.log('allTodos.length after dispatch', Array.from(allTodos).length)
+//   }
+// }
+
+//shorter and the same as function above
+export const fetchTodos = () =>  async dispatch=> {
+  const response = await client.get('/fakeApi/todos');
+  dispatch(todosLoaded(response));
+}
+
+
+export const todoSaved = (todos) => {
+  return { type: actionTypes.todosFetchAdded, payload: todos }
 }
 
 //write a synchronous outer function that receives the 'text' parameter:
-export function saveNewTodo(text){
-	return async function saveNewTodoThunk(dispatch, getState){
-		const newTodo = {text};
-		const response = await client.post('/fakeApi/todos',{todo:newTodo});
-		dispatch({type: actionTypes.todosFetchAdded, payload:response.todo});
-	}
+export function saveNewTodo(text) {
+  return async function saveNewTodoThunk(dispatch, getState) {
+    const newTodo = { text }
+    const response = await client.post('/fakeApi/todos', { todo: newTodo })
+    dispatch(todoSaved(response.todo))
+  }
 }

@@ -7,9 +7,9 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { actionTypes } from '../appActionTypes'
 
-const selectTodoById = (state, todoId) => {
-  return Array.from(state.todos).find((todo) => todo.id === todoId)
-}
+import {selectTodoById} from './todoSlice';
+
+
 
 const TodoListItem = ({ id: todoId }) => {
 	

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { availableColors, capitalize } from '../filters/colors'
-import { StatusFilters } from '../filters/filtersSlice'
+import { StatusFilters, colorFilterChanged } from '../filters/filtersSlice'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { actionTypes } from '../appActionTypes'
@@ -80,10 +80,7 @@ const AsideBar = () => {
 
   const onColorChange = (color, changeType) => {
     // console.log('Color change: ', { color, changeType })
-    dispatch({
-      type: actionTypes.colorFilterChanged,
-      payload: { color, changeType },
-    })
+    dispatch(colorFilterChanged(color,changeType))
   }
   const onStatusChange = (status) => {
     // console.log('Status change: ', status);

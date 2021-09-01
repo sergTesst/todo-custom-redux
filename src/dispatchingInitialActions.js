@@ -1,4 +1,4 @@
-import {fetchTodosData} from './features/todos/customFetchers';
+import {fetchTodos} from './features/todos/customFetchers';
 
 export const InitialActions = (store) => {
 
@@ -39,8 +39,7 @@ export const InitialActions = (store) => {
   // Dispatch one more action to see what happens
   store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' })
 
-	//Pass the _function_ we wrote to `dispatch`
-	store.dispatch(fetchTodosData);
+	store.dispatch(fetchTodos());
 	//logs: allTodos.length after dispatch
 
 
