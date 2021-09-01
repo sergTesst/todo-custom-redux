@@ -13,29 +13,40 @@ import { actionTypes } from '../appActionTypes'
 // 	})
 // }
 
+
+
+
+/*export function fetchTodos() {
+  return async function fetchTodosThunk(dispatch, getState) {
+    const stateBefore = getState()
+    console.log(
+      'todos before dispatch stateBefore.todos.length',
+      stateBefore.todos.length
+    )
+
+    const response = await client.get('/fakeApi/todos')
+
+    dispatch(todosLoaded(response))
+
+    const allTodos = getState().todos
+    console.log('allTodos.length after dispatch', Array.from(allTodos).length)
+  }
+}
+*/
+
+export const todosLoading = () => {
+  return { type: actionTypes.todosLoading }
+}
+
 export const todosLoaded = (todos) => {
   return { type: actionTypes.todosLoaded, payload: todos }
 }
 
-// export function fetchTodos() {
-//   return async function fetchTodosThunk(dispatch, getState) {
-//     const stateBefore = getState()
-//     console.log(
-//       'todos before dispatch stateBefore.todos.length',
-//       stateBefore.todos.length
-//     )
-
-//     const response = await client.get('/fakeApi/todos')
-
-//     dispatch(todosLoaded(response))
-
-//     const allTodos = getState().todos
-//     console.log('allTodos.length after dispatch', Array.from(allTodos).length)
-//   }
-// }
-
 //shorter and the same as function above
 export const fetchTodos = () =>  async dispatch=> {
+  
+  dispatch(todosLoading());
+
   const response = await client.get('/fakeApi/todos');
   dispatch(todosLoaded(response));
 }

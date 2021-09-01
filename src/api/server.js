@@ -60,7 +60,8 @@ const generateTodoText = () => {
 new Server({
   routes() {
     this.namespace = 'fakeApi'
-    //this.timing = 2000
+    this.timing = 2000;
+    // this.timing = 200000;
 
     this.resource('todos')
     this.resource('lists')

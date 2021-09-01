@@ -1,6 +1,6 @@
 import { actionTypes } from '../appActionTypes'
 
-import { createSelector } from 'reselect';
+import { createSelector } from 'reselect'
 
 import { StatusFilters } from '../filters/filtersSlice'
 
@@ -21,7 +21,17 @@ function nextTodoId(todos) {
  * }
  */
 
-export const initialState = []
+export const StatusLoadingData = {
+  loading: 'loading',
+  succeeded: 'succeeded',
+  failed: 'failed',
+  idle: 'idle',
+}
+
+export const initialState = {
+  status: StatusLoadingData.idle,
+  entities: [],
+}
 
 /*	this file only has to update the todos-related state 
 			- it's not nested any more!
@@ -33,34 +43,59 @@ export default function todosReducer(state = initialState, action) {
   switch (action.type) {
     //action.payload :string //text
     case actionTypes.todosAdded: {
-      const nextIdOfTodo = nextTodoId(state)
+      const nextIdOfTodo = nextTodoId(state.entities)
       const nextTodoText = action.payload
 
-      return [
+      return {
         ...state,
-        {
-          id: nextIdOfTodo,
-          text: nextTodoText,
-          completed: false,
-        },
-      ]
+        entities: [
+          ...state.entities,
+          {
+            id: nextIdOfTodo,
+            text: nextTodoText,
+            completed: false,
+          },
+        ],
+      }
     }
+    case actionTypes.todosLoading:{
+      return {
+        ...state,
+        status: StatusLoadingData.loading
+      }
+    }
+    case actionTypes.todosLoaded:{
+      const {todos} = action.payload;
+
+      return {
+        ...state,
+        status: StatusLoadingData.idle,
+        entities:[
+          ...state.entities,
+          ...todos
+        ]
+      }
+    }
+
     case actionTypes.todosFetchAdded: {
       const newTodo = action.payload
 
-      return [
+      return {
         ...state,
-        {
-          ...newTodo,
-        },
-      ]
+        entities: [
+          ...state.entities,
+          {
+            ...newTodo,
+          },
+        ],
+      }
     }
 
     // action.payload: number //id
     case actionTypes.todosToggled: {
       const targetTodoId = action.payload
 
-      return state.map((todo) => {
+      const mappedEntities = state.entities.map((todo) => {
         if (todo.id !== targetTodoId) {
           return todo
         }
@@ -70,6 +105,11 @@ export default function todosReducer(state = initialState, action) {
           completed: !todo.completed,
         }
       })
+
+      return {
+        ...state,
+        entities: [...mappedEntities],
+      }
     }
 
     /*action.payload = {
@@ -80,7 +120,7 @@ export default function todosReducer(state = initialState, action) {
     case actionTypes.todosColorSelected: {
       const { color, todoId } = action.payload
 
-      return state.map((todo) => {
+      const mappedEntities = state.entities.map((todo) => {
         if (todo.id !== todoId) {
           return todo
         }
@@ -91,6 +131,11 @@ export default function todosReducer(state = initialState, action) {
           color,
         }
       })
+
+      return {
+        ...state,
+        entities: [...mappedEntities],
+      }
     }
 
     /**
@@ -100,20 +145,35 @@ export default function todosReducer(state = initialState, action) {
      */
     case actionTypes.todoDeleted: {
       const { todoId } = action.payload
-      return state.filter((todo) => todo.id !== todoId)
+      const filteredEntities = state.entities.filter(
+        (todo) => todo.id !== todoId
+      )
+
+      return {
+        ...state,
+        entities: [...filteredEntities],
+      }
     }
     case actionTypes.allTodosCompleted: {
-      return state.map((todo) => {
+      const mappedEntities = state.entities.map((todo) => {
         return { ...todo, completed: true }
       })
+      return {
+        ...state,
+        entities: [...mappedEntities],
+      }
     }
     case actionTypes.todosCompletedCleared: {
       //return all todo[] with completed false
-      return state.filter((todo) => !todo.completed)
+      const filteredEntities = state.entities.filter((todo) => !todo.completed)
+      return {
+        ...state,
+        entities: [...filteredEntities],
+      }
     }
     case actionTypes.todosLoaded: {
       const { todos } = action.payload
-      return [...state, ...todos]
+      return {...state, entities:[...todos] }
     }
 
     default:
@@ -123,20 +183,19 @@ export default function todosReducer(state = initialState, action) {
 
 /*export const selectTodoIds = createSelector(
   // first, pass one or more "input selector " functions:
-  state => state.todos,
+  state => selectTodos,
   //then, an 'output selector' that receives all the input results as arguments
   // and returns a final result value
   todos=>todos.map(todo=>todo.id)
 )
 */
 
-
 /*export const selectFilteredTodoIds = ({ status, colors }) => {
 
   // first, pass one or more "input selector " functions:
   return createSelector(
     (state) => {
-      return state.todos.filter((todo) => {
+      return selectTodos(state).filter((todo) => {
         const { completed, color } = todo
 
         let colorsSelected = Array.from(colors).length > 0
@@ -174,7 +233,8 @@ export default function todosReducer(state = initialState, action) {
 }
 */
 
-export const selectTodos = state => state.todos;
+export const selectTodos = (state) => state.todos.entities;
+export const selectTodosStatus = (state) => state.todos.status;
 
 export const selectTodoById = (state, todoId) => {
   return selectTodos(state).find((todo) => todo.id === todoId)
@@ -182,41 +242,41 @@ export const selectTodoById = (state, todoId) => {
 
 //todoSlice is importing a value from the filtersSlice
 
-//if two slices both try to import smth from each other, you 
+//if two slices both try to import smth from each other, you
 //can end up with a 'cyclic import dependency' problem that can cause your code to crash
 
 export const selectFilteredTodos = createSelector(
   //First input selector: all todos,
   selectTodos,
   //second input selector: current status filter
-  state=>state.filters,
+  (state) => state.filters,
   //Output selector: receives both values
-  (todos, filters)=>{
-    const {status, colors} = filters;
-    const showAllCompleted = `${status}`.toLowerCase() === StatusFilters.All;
+  (todos, filters) => {
+    const { status, colors } = filters
+    const showAllCompleted = `${status}`.toLowerCase() === StatusFilters.All
 
-    if( showAllCompleted && colors.length === 0){
-      return todos;
+    if (showAllCompleted && colors.length === 0) {
+      return todos
     }
 
-    const completedStatus = status === StatusFilters.Completed;
+    const completedStatus = status === StatusFilters.Completed
 
     //Return either active or completed todos based on filter
-    return todos.filter((todo)=>{
-      const statusMatches = 
-        showAllCompleted || todo.completed === completedStatus;
+    return todos.filter((todo) => {
+      const statusMatches =
+        showAllCompleted || todo.completed === completedStatus
 
-      const colorMatches = colors.length === 0 || colors.includes(todo.color);
+      const colorMatches = colors.length === 0 || colors.includes(todo.color)
 
-      return statusMatches && colorMatches;
-    });
-  } 
-);
+      return statusMatches && colorMatches
+    })
+  }
+)
 
-export const selectFilteredTodoIds  = createSelector(
+export const selectFilteredTodoIds = createSelector(
   //Pass our other memoized selector as an input
   selectFilteredTodos,
-  
+
   //And derive data in the output selector
-  filteredTodos => filteredTodos.map(todo=>todo.id)
+  (filteredTodos) => filteredTodos.map((todo) => todo.id)
 )

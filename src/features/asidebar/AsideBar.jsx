@@ -6,16 +6,15 @@ import { StatusFilters, colorFilterChanged } from '../filters/filtersSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { actionTypes } from '../appActionTypes'
 
-const RemainingTodos = ({ count }) => {
-  const suffix = count === 1 ? '' : 's'
+import {
+  selectTodos,
+  selectTodosStatus,
+  StatusLoadingData,
+} from '../todos/todoSlice';
 
-  return (
-    <div className="todo-count">
-      <h5>Remaining Todos</h5>
-      <strong>{count}</strong>item{suffix} left
-    </div>
-  )
-}
+
+
+
 const StatusFilter = ({ value: status, onChange }) => {
   const renderedFilters = Object.keys(StatusFilters).map((key) => {
     const valueStatus = StatusFilters[key]
@@ -69,35 +68,67 @@ const ColorFilters = ({ value: colors, onChange }) => {
   )
 }
 
+const RemainingTodos = ({ count }) => {
+  const suffix = count === 1 ? '' : 's'
+
+  return (
+    <div>
+      <strong>{count}</strong>item{suffix} left
+    </div>
+  )
+}
+
+const RemainingTodosWrapper = () => {
+  const todosRemaining = useSelector((state) => {
+    const uncompleteTodos = selectTodos(state).filter((todo) => !todo.completed)
+    return Array.from(uncompleteTodos).length
+  })
+
+  const loadingStatus = useSelector(selectTodosStatus);
+  
+  let renderedContent;
+  if (loadingStatus === StatusLoadingData.loading) {
+    renderedContent = <div style={{width:`20px`,height:`20px`}} className="loader"></div>;
+  }else{
+    renderedContent = <RemainingTodos count={todosRemaining}></RemainingTodos>;
+  }
+
+  return(
+    <div className="todo-count">
+      <h5>Remaining Todos</h5>
+      {renderedContent}
+    </div>
+    
+  ) 
+}
+
 const AsideBar = () => {
   const { status, colors } = useSelector((state) => state.filters)
 
-  const todosRemaining = useSelector((state) => {
-    const uncompleteTodos = state.todos.filter((todo) => !todo.completed)
-    return Array.from(uncompleteTodos).length
-  })
   const dispatch = useDispatch()
 
   const onColorChange = (color, changeType) => {
     // console.log('Color change: ', { color, changeType })
-    dispatch(colorFilterChanged(color,changeType))
+    dispatch(colorFilterChanged(color, changeType))
   }
+
   const onStatusChange = (status) => {
     // console.log('Status change: ', status);
     dispatch({
-      type:actionTypes.statusFilterChanged,
-      payload:status
+      type: actionTypes.statusFilterChanged,
+      payload: status,
     })
-
   }
+
   const markAllCompletedHandler = () => {
     dispatch({
-      type:actionTypes.allTodosCompleted,
+      type: actionTypes.allTodosCompleted,
     })
   }
+
   const clearCompletedHandler = () => {
     dispatch({
-      type:actionTypes.todosCompletedCleared,
+      type: actionTypes.todosCompletedCleared,
     })
   }
 
@@ -113,7 +144,7 @@ const AsideBar = () => {
         </button>
       </div>
 
-      <RemainingTodos count={todosRemaining}></RemainingTodos>
+      <RemainingTodosWrapper></RemainingTodosWrapper>
       <StatusFilter value={status} onChange={onStatusChange}></StatusFilter>
       <ColorFilters value={colors} onChange={onColorChange}></ColorFilters>
     </aside>
