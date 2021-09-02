@@ -4,6 +4,10 @@ import { createSelector } from 'reselect'
 
 import { StatusFilters } from '../filters/filtersSlice'
 
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit'
+
+import { fetchTodos, saveNewTodo } from './customFetchers'
+
 function nextTodoId(todos) {
   const maxId = Array.from(todos).reduce(
     (maxId, todo) => Math.max(todo.id, maxId),
@@ -13,6 +17,30 @@ function nextTodoId(todos) {
   return maxId + 1 + Number(new Date().getTime())
 }
 
+export const StatusLoadingData = {
+  loading: 'loading',
+  succeeded: 'succeeded',
+  failed: 'failed',
+  idle: 'idle',
+}
+
+
+
+export const initialState = {
+  status: StatusLoadingData.idle,
+  entities: {},
+}
+
+/**
+ * sample example of entities object (lookup table)
+ * entities:{
+ * '20':{id: 20, value:'Some value'}
+ * '21':{id: 21, value:'Some other value'}
+ * ...
+ * }
+ */
+
+
 /** interface Todo {
  * 	id: number;
  * 	text: string;
@@ -21,218 +49,102 @@ function nextTodoId(todos) {
  * }
  */
 
-export const StatusLoadingData = {
-  loading: 'loading',
-  succeeded: 'succeeded',
-  failed: 'failed',
-  idle: 'idle',
-}
+//mutating code is ok inside createSlice
 
-export const initialState = {
-  status: StatusLoadingData.idle,
-  entities: {},
-}
+const todosSlice = createSlice({
+  name: 'todos',
+  initialState,
 
-/*	this file only has to update the todos-related state 
-			- it's not nested any more!
-			
-		this is called reducer composition
-*/
-
-export default function todosReducer(state = initialState, action) {
-  switch (action.type) {
-    //action.payload :string //text
-    case actionTypes.todosAdded: {
+  reducers: {
+    todosAdded(state, action) {
       const nextIdOfTodo = nextTodoId(state.entities)
       const nextTodoText = action.payload
-
-      return {
-        ...state,
-        entities: {
-          ...state.entities,
-          nextIdOfTodo: {
-            id: nextIdOfTodo,
-            text: nextTodoText,
-            completed: false,
-          },
-        },
+      const newTodo = {
+        id: nextIdOfTodo,
+        text: nextTodoText,
+        completed: false,
       }
-    }
-    case actionTypes.todosLoading: {
-      return {
-        ...state,
-        status: StatusLoadingData.loading,
-      }
-    }
-    case actionTypes.todosLoaded: {
-      const { todos } = action.payload
-      const newEntities = {}
-      todos.forEach((todo) => {
-        newEntities[todo.id] = todo
-      })
 
-      return {
-        ...state,
-        status: StatusLoadingData.idle,
-        entities: {
-          ...state.entities,
-          ...newEntities,
-        },
-      }
-    }
+      state.entities[nextIdOfTodo] = newTodo
+    },
 
-    case actionTypes.todosFetchAdded: {
-      const newTodo = action.payload
-
-      return {
-        ...state,
-        entities: {
-          ...state.entities,
-          [newTodo.id]: newTodo,
-        },
-      }
-    }
-
-    // action.payload: number //id
-    case actionTypes.todosToggled: {
+    todosToggled(state, action) {
       const targetTodoId = action.payload
       const todo = state.entities[targetTodoId]
-
-      return {
-        ...state,
-        entities: {
-          ...state.entities,
-          [targetTodoId]: {
-            ...todo,
-            completed: !todo.completed,
-          },
-        },
-      }
-    }
+      todo.completed = !todo.completed
+    },
 
     /*action.payload = {
 			color:string,
 			todoId:number
 		}
 		*/
-    case actionTypes.todosColorSelected: {
-      const { color, todoId } = action.payload
-      const todo = state.entities[todoId]
-
-      return {
-        ...state,
-        entities: {
-          ...state.entities,
-          [todoId]: {
-            ...todo,
-            color,
-          },
-        },
-      }
-    }
+    todosColorSelected: {
+      reducer(state, action) {
+        const { color, todoId } = action.payload
+        state.entities[todoId].color = color
+      },
+      prepare(todoId, color) {
+        return {
+          payload: { todoId, color },
+        }
+      },
+    },
 
     /**
      * action.payload = {
      * 	todoId:number
      * }
      */
-    case actionTypes.todoDeleted: {
+    todoDeleted(state, action) {
       const { todoId } = action.payload
-      const newEntities = { ...state.entities }
-      delete newEntities[todoId]
-
-      return {
-        ...state,
-        entities: newEntities,
-      }
-    }
-
-    case actionTypes.allTodosCompleted: {
-      const newEntities = { ...state.entities }
-
-      Object.values(newEntities).forEach((todo) => {
-        newEntities[todo.id] = {
-          ...todo,
-          completed: true,
-        }
-      })
-
-      return {
-        ...state,
-        entities: newEntities,
-      }
-    }
-    case actionTypes.todosCompletedCleared: {
-      const newEntities = { ...state.entities }
-
-      Object.values(newEntities).forEach((todo) => {
-        if (todo.completed) {
-          delete newEntities[todo.id]
-        }
-      })
-
-      return {
-        ...state,
-        entities: newEntities,
-      }
-    }
-
-    default:
-      return state
-  }
-}
-
-/*export const selectTodoIds = createSelector(
-  // first, pass one or more "input selector " functions:
-  state => selectTodos,
-  //then, an 'output selector' that receives all the input results as arguments
-  // and returns a final result value
-  todos=>todos.map(todo=>todo.id)
-)
-*/
-
-/*export const selectFilteredTodoIds = ({ status, colors }) => {
-
-  // first, pass one or more "input selector " functions:
-  return createSelector(
-    (state) => {
-      return selectTodos(state).filter((todo) => {
-        const { completed, color } = todo
-
-        let colorsSelected = Array.from(colors).length > 0
-        let byColor = colorsSelected === false
-        if (colorsSelected) {
-          byColor = Array.from(colors).includes(color)
-        }
-
-        let byStatus
-        switch (`${status}`.toLowerCase()) {
-          case StatusFilters.All: {
-            byStatus = true
-            break
-          }
-          case StatusFilters.Active: {
-            byStatus = completed === false
-            break
-          }
-          case StatusFilters.Completed: {
-            byStatus = completed === true
-            break
-          }
-          default:
-            byStatus = true
-        }
-        return byColor && byStatus
+      delete state.entities[todoId]
+    },
+    allTodosCompleted(state, action) {
+      Object.values(state.entities).forEach((todo) => {
+        todo.completed = true
       })
     },
+    todosCompletedCleared(state, action) {
+      Object.values(state.entities).forEach((todo) => {
+        if (todo.completed) {
+          delete state.entities[todo.id]
+        }
+      })
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTodos.pending, (state, action) => {
+        state.status = StatusLoadingData.loading
+      })
+      .addCase(fetchTodos.fulfilled, (state, action) => {
+        const { todos } = action.payload
+        const newEntities = {}
+        todos.forEach((todo) => {
+          newEntities[todo.id] = todo
+        })
 
+        state.entities = newEntities
+        state.status = StatusLoadingData.idle
+      })
+      .addCase(saveNewTodo.fulfilled, (state, action) => {
+        const newTodo = action.payload
+        state.entities[newTodo.id] = newTodo
+      })
+  },
+})
 
-    //then, an 'output selector' that receives all the input results as arguments
-    // and returns a final result value
-    (todos) => todos.map((todo) => todo.id)
-  )
-}
-*/
+export const {
+  todosAdded,
+  todosToggled,
+  todosColorSelected,
+  todoDeleted,
+  allTodosCompleted,
+  todosCompletedCleared,
+} = todosSlice.actions
+
+export default todosSlice.reducer
 
 export const selectTodoEntities = (state) => state.todos.entities
 

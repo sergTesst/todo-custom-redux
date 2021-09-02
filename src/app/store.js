@@ -1,39 +1,25 @@
-import { createStore, compose, applyMiddleware } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { loggerMiddleware } from '../exampleAddons/middleware';
 
-import rootReducer from '../features/reducer'
+import { configureStore } from '@reduxjs/toolkit';
 
-import {
-  loggerMiddleware,
-} from '../exampleAddons/middleware'
-
-import {
-  delayedActionMiddleware,
-  asyncFunctionMiddleware,
-} from '../exampleAddons/asyncMiddleware';
-
-import thunkMiddleware from 'redux-thunk'
+import todosReducer from '../features/todos/todoSlice';
+import filtersReducer from '../features/filters/filtersSlice';
 
 
+//combines todosReducer & filtersReducer into the root reducer
+//creates a Redux store using root reducer
+//automatically adds thunk middleware
+//added more middlewares to check for common mistakes like accidentally 
+//mutating the state
+// automatically set up redux devTools extension
 
-const composedEnhancer = composeWithDevTools(
-
-  // add whatever middleware you actually want to use here
-  applyMiddleware(
-    //custom middlewares
-    loggerMiddleware,
-
-    // delays todoAdd on 1 second
-    // delayedActionMiddleware,
-
-    //calls action with dispatch and getState
-    // asyncFunctionMiddleware,
-
-    //redux middlewares
-    //calls action with dispatch and getState like asyncFunctionMiddleware
-    thunkMiddleware 
-  )
-)
-const store = createStore(rootReducer, composedEnhancer)
+const store = configureStore({
+  reducer: {
+    todos:todosReducer,
+    filters: filtersReducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(loggerMiddleware),
+})
 
 export default store

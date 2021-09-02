@@ -1,66 +1,27 @@
 import { client } from '../../api/client'
 import { actionTypes } from '../appActionTypes'
 
-//Write a function that has `dispatch ` nad `getState` as arguments
-// export const fetchTodosData = (dispatch, getState)=>{
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-// 	client.get('/fakeApi/todos').then(response=>{
-// 		dispatch({type:actionTypes.todosLoaded, payload: response});
+//you can only pass one argument to the thunk when you dispatch it.
+//for multiple values, pass them in a single object
 
-// 		const allTodos = getState().todos;
-// 		console.log('allTodos.length after dispatch', Array.from(allTodos).length);
+//the payload creator will recieve an obj as its second arg, which contains
+// {getState, dispatch }and some other useful value
 
-// 	})
-// }
+//thunk dispatches the pending action before running your payload creator
+// then dispatchs either fulfilled or rejected based on whether the 
+// promise you return succeeds of fails
 
-
-
-
-/*export function fetchTodos() {
-  return async function fetchTodosThunk(dispatch, getState) {
-    const stateBefore = getState()
-    console.log(
-      'todos before dispatch stateBefore.todos.length',
-      stateBefore.todos.length
-    )
-
-    const response = await client.get('/fakeApi/todos')
-
-    dispatch(todosLoaded(response))
-
-    const allTodos = getState().todos
-    console.log('allTodos.length after dispatch', Array.from(allTodos).length)
-  }
-}
-*/
-
-export const todosLoading = () => {
-  return { type: actionTypes.todosLoading }
-}
-
-export const todosLoaded = (todos) => {
-  return { type: actionTypes.todosLoaded, payload: todos }
-}
-
-//shorter and the same as function above
-export const fetchTodos = () =>  async dispatch=> {
-  
-  dispatch(todosLoading());
-
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', async()=>{
   const response = await client.get('/fakeApi/todos');
-  dispatch(todosLoaded(response));
-}
+  return response;
+})
 
+export const saveNewTodo = createAsyncThunk('todos/saveNewTodo',async (text) => {
 
-export const todoSaved = (todos) => {
-  return { type: actionTypes.todosFetchAdded, payload: todos }
-}
-
-//write a synchronous outer function that receives the 'text' parameter:
-export function saveNewTodo(text) {
-  return async function saveNewTodoThunk(dispatch, getState) {
-    const newTodo = { text }
-    const response = await client.post('/fakeApi/todos', { todo: newTodo })
-    dispatch(todoSaved(response.todo))
-  }
-}
+  const newTodo = { text }
+  const response = await client.post('/fakeApi/todos', { todo: newTodo });
+  return response.todo;
+  
+})
