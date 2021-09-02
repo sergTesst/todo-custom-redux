@@ -11,6 +11,8 @@ import {
 const TodoList = () => {
   //returning new array references in selectors causes components to re-render every time
   const todoIds = useSelector((state) => selectFilteredTodoIds(state));
+  console.log('todoList todoIds', todoIds);
+  
   const loadingStatus = useSelector(selectTodosStatus);
 
   if(loadingStatus === StatusLoadingData.loading){

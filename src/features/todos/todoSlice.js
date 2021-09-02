@@ -24,12 +24,15 @@ export const StatusLoadingData = {
   idle: 'idle',
 }
 
-
-
-export const initialState = {
+/**
+ * createEntityAdapter API that has prebuilt reducers for typical data 
+ * update operations with NORMALIZED STATE (lookup table)
+ * generates some memoized selectors for reading values from the store
+ */
+const todosAdapter = createEntityAdapter();
+const initialState = todosAdapter.getInitialState({
   status: StatusLoadingData.idle,
-  entities: {},
-}
+}) 
 
 /**
  * sample example of entities object (lookup table)
@@ -69,9 +72,9 @@ const todosSlice = createSlice({
     },
 
     todosToggled(state, action) {
-      const targetTodoId = action.payload
-      const todo = state.entities[targetTodoId]
-      todo.completed = !todo.completed
+      const targetTodoId = action.payload;
+      const todo = state.entities[targetTodoId];
+      todo.completed = !todo.completed;
     },
 
     /*action.payload = {
@@ -97,8 +100,8 @@ const todosSlice = createSlice({
      * }
      */
     todoDeleted(state, action) {
-      const { todoId } = action.payload
-      delete state.entities[todoId]
+      const { todoId } = action.payload;
+      todosAdapter.removeOne(state,todoId);
     },
     allTodosCompleted(state, action) {
       Object.values(state.entities).forEach((todo) => {
@@ -106,11 +109,13 @@ const todosSlice = createSlice({
       })
     },
     todosCompletedCleared(state, action) {
-      Object.values(state.entities).forEach((todo) => {
-        if (todo.completed) {
-          delete state.entities[todo.id]
-        }
-      })
+      const completedIds = Object.values(state.entities)
+      .filter(todo=>todo.completed)
+      .map(todo=>todo.id);
+
+      //use an adapter function as a 'mutating' update helper
+      todosAdapter.removeMany(state, completedIds);
+
     },
   },
   extraReducers: (builder) => {
@@ -119,18 +124,13 @@ const todosSlice = createSlice({
         state.status = StatusLoadingData.loading
       })
       .addCase(fetchTodos.fulfilled, (state, action) => {
-        const { todos } = action.payload
-        const newEntities = {}
-        todos.forEach((todo) => {
-          newEntities[todo.id] = todo
-        })
-
-        state.entities = newEntities
-        state.status = StatusLoadingData.idle
+        const { todos } = action.payload;
+        todosAdapter.setAll(state, todos);
+        state.status = StatusLoadingData.idle;
       })
       .addCase(saveNewTodo.fulfilled, (state, action) => {
-        const newTodo = action.payload
-        state.entities[newTodo.id] = newTodo
+        const newTodo = action.payload;
+        todosAdapter.addOne(state, newTodo);
       })
   },
 })
@@ -146,17 +146,21 @@ export const {
 
 export default todosSlice.reducer
 
-export const selectTodoEntities = (state) => state.todos.entities
+export const selectTodoEntities = (state) => state.todos.entities;
+export const selectTodosStatus = (state) => state.todos.status;
 
-export const selectTodos = createSelector(selectTodoEntities, (entities) => {
-  return Object.values(entities)
-})
 
-export const selectTodosStatus = (state) => state.todos.status
+export const {
+  selectAll:selectTodos,
+  selectById:selectTodoById
+} = todosAdapter.getSelectors(state=> state.todos);
 
-export const selectTodoById = (state, todoId) => {
-  return selectTodoEntities(state)[todoId]
-}
+
+export const selectTodoIds = createSelector(
+  selectTodos,
+  (todos)=>todos.map(todo=>todo.id)
+)
+
 
 //todoSlice is importing a value from the filtersSlice
 
@@ -170,8 +174,9 @@ export const selectFilteredTodos = createSelector(
   (state) => state.filters,
   //Output selector: receives both values
   (todos, filters) => {
-    const { status, colors } = filters
-    const showAllCompleted = `${status}`.toLowerCase() === StatusFilters.All
+
+    const { status, colors } = filters;
+    const showAllCompleted = `${status}`.toLowerCase() === StatusFilters.All;
 
     if (showAllCompleted && colors.length === 0) {
       return todos
@@ -196,5 +201,10 @@ export const selectFilteredTodoIds = createSelector(
   selectFilteredTodos,
 
   //And derive data in the output selector
-  (filteredTodos) => filteredTodos.map((todo) => todo.id)
+  (filteredTodos) => {
+    return filteredTodos.map((todo) => {
+      return todo.id;
+    })
+  }
+  
 )

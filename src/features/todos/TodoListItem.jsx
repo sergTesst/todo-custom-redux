@@ -7,13 +7,10 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { actionTypes } from '../appActionTypes'
 
-import {selectTodoById} from './todoSlice';
-
-
+import { selectTodoById, todosToggled, todosColorSelected,todoDeleted } from './todoSlice'
 
 const TodoListItem = ({ id: todoId }) => {
-	
-	console.log('i am rendering ',{todoId});
+  console.log('i am rendering ', { todoId })
 
   const todo = useSelector((state) => selectTodoById(state, todoId))
 
@@ -21,22 +18,14 @@ const TodoListItem = ({ id: todoId }) => {
   const dispatch = useDispatch()
 
   const handleCompletedChanged = (e) => {
-    dispatch({ type: actionTypes.todosToggled, payload: todo.id })
+    dispatch(todosToggled(todo.id))
   }
   const handleColorChanged = (e) => {
-    dispatch({
-      type: actionTypes.todosColorSelected,
-      payload: {
-        color: e.target.value,
-        todoId: todo.id,
-      },
-    })
+    const color = e.target.value;
+    dispatch(todosColorSelected(todo.id, color));
   }
   const handleTodoDeleted = (e) => {
-    dispatch({
-      type: actionTypes.todoDeleted,
-      payload: { todoId: todo.id },
-    })
+    dispatch(todoDeleted({todoId:todo.id}))
   }
 
   const colorOptions = availableColors.map((c) => (

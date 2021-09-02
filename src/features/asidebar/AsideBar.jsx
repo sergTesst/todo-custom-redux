@@ -10,6 +10,8 @@ import {
   selectTodos,
   selectTodosStatus,
   StatusLoadingData,
+  allTodosCompleted,
+  todosCompletedCleared
 } from '../todos/todoSlice';
 
 
@@ -108,7 +110,6 @@ const AsideBar = () => {
   const dispatch = useDispatch()
 
   const onColorChange = (color, changeType) => {
-    // console.log('Color change: ', { color, changeType })
     dispatch(colorFilterChanged(color, changeType))
   }
 
@@ -121,15 +122,11 @@ const AsideBar = () => {
   }
 
   const markAllCompletedHandler = () => {
-    dispatch({
-      type: actionTypes.allTodosCompleted,
-    })
+    dispatch(allTodosCompleted())
   }
 
   const clearCompletedHandler = () => {
-    dispatch({
-      type: actionTypes.todosCompletedCleared,
-    })
+    dispatch(todosCompletedCleared())
   }
 
   return (
