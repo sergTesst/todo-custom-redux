@@ -30,7 +30,7 @@ export const StatusLoadingData = {
 
 export const initialState = {
   status: StatusLoadingData.idle,
-  entities: [],
+  entities: {},
 }
 
 /*	this file only has to update the todos-related state 
@@ -48,32 +48,36 @@ export default function todosReducer(state = initialState, action) {
 
       return {
         ...state,
-        entities: [
+        entities: {
           ...state.entities,
-          {
+          nextIdOfTodo: {
             id: nextIdOfTodo,
             text: nextTodoText,
             completed: false,
           },
-        ],
+        },
       }
     }
-    case actionTypes.todosLoading:{
+    case actionTypes.todosLoading: {
       return {
         ...state,
-        status: StatusLoadingData.loading
+        status: StatusLoadingData.loading,
       }
     }
-    case actionTypes.todosLoaded:{
-      const {todos} = action.payload;
+    case actionTypes.todosLoaded: {
+      const { todos } = action.payload
+      const newEntities = {}
+      todos.forEach((todo) => {
+        newEntities[todo.id] = todo
+      })
 
       return {
         ...state,
         status: StatusLoadingData.idle,
-        entities:[
+        entities: {
           ...state.entities,
-          ...todos
-        ]
+          ...newEntities,
+        },
       }
     }
 
@@ -82,33 +86,27 @@ export default function todosReducer(state = initialState, action) {
 
       return {
         ...state,
-        entities: [
+        entities: {
           ...state.entities,
-          {
-            ...newTodo,
-          },
-        ],
+          [newTodo.id]: newTodo,
+        },
       }
     }
 
     // action.payload: number //id
     case actionTypes.todosToggled: {
       const targetTodoId = action.payload
-
-      const mappedEntities = state.entities.map((todo) => {
-        if (todo.id !== targetTodoId) {
-          return todo
-        }
-
-        return {
-          ...todo,
-          completed: !todo.completed,
-        }
-      })
+      const todo = state.entities[targetTodoId]
 
       return {
         ...state,
-        entities: [...mappedEntities],
+        entities: {
+          ...state.entities,
+          [targetTodoId]: {
+            ...todo,
+            completed: !todo.completed,
+          },
+        },
       }
     }
 
@@ -119,22 +117,17 @@ export default function todosReducer(state = initialState, action) {
 		*/
     case actionTypes.todosColorSelected: {
       const { color, todoId } = action.payload
-
-      const mappedEntities = state.entities.map((todo) => {
-        if (todo.id !== todoId) {
-          return todo
-        }
-
-        //return todo with todoId with added || modified color prop
-        return {
-          ...todo,
-          color,
-        }
-      })
+      const todo = state.entities[todoId]
 
       return {
         ...state,
-        entities: [...mappedEntities],
+        entities: {
+          ...state.entities,
+          [todoId]: {
+            ...todo,
+            color,
+          },
+        },
       }
     }
 
@@ -145,35 +138,43 @@ export default function todosReducer(state = initialState, action) {
      */
     case actionTypes.todoDeleted: {
       const { todoId } = action.payload
-      const filteredEntities = state.entities.filter(
-        (todo) => todo.id !== todoId
-      )
+      const newEntities = { ...state.entities }
+      delete newEntities[todoId]
 
       return {
         ...state,
-        entities: [...filteredEntities],
+        entities: newEntities,
       }
     }
+
     case actionTypes.allTodosCompleted: {
-      const mappedEntities = state.entities.map((todo) => {
-        return { ...todo, completed: true }
+      const newEntities = { ...state.entities }
+
+      Object.values(newEntities).forEach((todo) => {
+        newEntities[todo.id] = {
+          ...todo,
+          completed: true,
+        }
       })
+
       return {
         ...state,
-        entities: [...mappedEntities],
+        entities: newEntities,
       }
     }
     case actionTypes.todosCompletedCleared: {
-      //return all todo[] with completed false
-      const filteredEntities = state.entities.filter((todo) => !todo.completed)
+      const newEntities = { ...state.entities }
+
+      Object.values(newEntities).forEach((todo) => {
+        if (todo.completed) {
+          delete newEntities[todo.id]
+        }
+      })
+
       return {
         ...state,
-        entities: [...filteredEntities],
+        entities: newEntities,
       }
-    }
-    case actionTypes.todosLoaded: {
-      const { todos } = action.payload
-      return {...state, entities:[...todos] }
     }
 
     default:
@@ -233,11 +234,16 @@ export default function todosReducer(state = initialState, action) {
 }
 */
 
-export const selectTodos = (state) => state.todos.entities;
-export const selectTodosStatus = (state) => state.todos.status;
+export const selectTodoEntities = (state) => state.todos.entities
+
+export const selectTodos = createSelector(selectTodoEntities, (entities) => {
+  return Object.values(entities)
+})
+
+export const selectTodosStatus = (state) => state.todos.status
 
 export const selectTodoById = (state, todoId) => {
-  return selectTodos(state).find((todo) => todo.id === todoId)
+  return selectTodoEntities(state)[todoId]
 }
 
 //todoSlice is importing a value from the filtersSlice
