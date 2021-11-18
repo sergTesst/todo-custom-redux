@@ -60,7 +60,7 @@ const generateTodoText = () => {
 new Server({
   routes() {
     this.namespace = 'fakeApi'
-    this.timing = 2000;
+    // this.timing = 2000;
     // this.timing = 200000;
 
     this.resource('todos')
@@ -108,8 +108,12 @@ new Server({
         const numerifyId = (todo) => {
           todo.id = Number(todo.id)
         }
-        console.log('serialize(object, request) this, arguments', this, arguments);
-        
+        console.log(
+          'serialize(object, request) this, arguments',
+          this,
+          arguments
+        )
+
         let json = IdSerializer.prototype.serialize.apply(this, arguments)
 
         if (json.todo) {

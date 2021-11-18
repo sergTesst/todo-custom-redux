@@ -1,22 +1,25 @@
 import React from 'react'
 import TodoListItem from './TodoListItem'
-import { useSelector, shallowEqual } from 'react-redux'
+import {
+  useSelector,
+  // shallowEqual
+} from 'react-redux'
 
-import { 
-  selectFilteredTodoIds, 
+import {
+  selectFilteredTodoIds,
   selectTodosStatus,
-  StatusLoadingData
- } from './todoSlice';
+  StatusLoadingData,
+} from './todoSlice'
 
 const TodoList = () => {
   //returning new array references in selectors causes components to re-render every time
-  const todoIds = useSelector((state) => selectFilteredTodoIds(state));
-  const loadingStatus = useSelector(selectTodosStatus);
+  const todoIds = useSelector((state) => selectFilteredTodoIds(state))
+  const loadingStatus = useSelector(selectTodosStatus)
 
-  if(loadingStatus === StatusLoadingData.loading){
-    return(
-      <div className='todo-list'>
-        <div className='loader'></div>
+  if (loadingStatus === StatusLoadingData.loading) {
+    return (
+      <div className="todo-list">
+        <div className="loader"></div>
       </div>
     )
   }
@@ -26,9 +29,9 @@ const TodoList = () => {
   })
 
   return (
-    <>
+    <React.Fragment>
       <ul className="todo-list">{renderedListItems}</ul>
-    </>
+    </React.Fragment>
   )
 }
 

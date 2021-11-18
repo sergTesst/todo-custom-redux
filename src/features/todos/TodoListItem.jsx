@@ -1,19 +1,16 @@
 import React from 'react'
 
-import { ReactComponent as TimesSolid } from './times-solid.svg'
+import { TimesSolid } from './times-solid.js'
 import { availableColors, capitalize } from '../filters/colors'
 
 import { useSelector, useDispatch } from 'react-redux'
 
 import { actionTypes } from '../appActionTypes'
 
-import {selectTodoById} from './todoSlice';
-
-
+import { selectTodoById } from './todoSlice'
 
 const TodoListItem = ({ id: todoId }) => {
-	
-	console.log('i am rendering ',{todoId});
+  console.log('i am rendering ', { todoId })
 
   const todo = useSelector((state) => selectTodoById(state, todoId))
 
@@ -68,9 +65,8 @@ const TodoListItem = ({ id: todoId }) => {
             <option value=""></option>
             {colorOptions}
           </select>
-
           <button className="destroy" onClick={handleTodoDeleted}>
-            <TimesSolid></TimesSolid>
+            <TimesSolid />
           </button>
         </div>
       </div>
